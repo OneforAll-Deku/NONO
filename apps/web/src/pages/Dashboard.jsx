@@ -69,7 +69,7 @@ export default function Dashboard({ session }) {
 
     const fetchLogs = async () => {
         try {
-            let url = `http://localhost:3000/api/logs?user_id=${session?.user?.id}`;
+            let url = `${import.meta.env.VITE_API_URL}/api/logs?user_id=${session?.user?.id}`;
             if (dateRange.start) url += `&start_date=${dateRange.start}`;
             if (dateRange.end) url += `&end_date=${dateRange.end}`;
 
