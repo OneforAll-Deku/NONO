@@ -2,7 +2,7 @@
  * Smart Time Tracker - Extension Popup
  */
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "https://nono-ral1.onrender.com";
 const DASHBOARD_URL = "http://localhost:5173/";
 
 const elTime = document.getElementById("time");

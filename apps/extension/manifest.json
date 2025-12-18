@@ -10,7 +10,7 @@
         "idle"
     ],
     "host_permissions": [
-        "http://localhost:3000/*"
+        "https://nono-ral1.onrender.com/*"
     ],
     "content_scripts": [
         {

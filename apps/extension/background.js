@@ -198,7 +198,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           JSON.stringify(body),
         );
 
-        const response = await fetch("http://localhost:3000/api/logs", {
+        const response = await fetch("https://nono-ral1.onrender.com/api/logs", {
           method: "POST",
           headers,
           body: JSON.stringify(body),
