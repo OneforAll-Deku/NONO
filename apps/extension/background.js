@@ -190,7 +190,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           headers.Authorization = `Bearer ${extension_token}`;
         }
 
-        const body = useToken ? { logs } : { logs, user_id };
+        // Force legacy user_id inclusion if available, as a fail-safe
+        const body = { logs, user_id: useToken ? undefined : user_id };
+        if (user_id && !body.user_id) body.user_id = user_id;
 
         console.log(
           logPrefix(),
