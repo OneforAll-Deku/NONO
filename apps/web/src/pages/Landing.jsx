@@ -225,7 +225,7 @@ export default function Landing() {
                             <Linkedin size={20} />
                         </a>
                         <a
-                            href="https://github.com/OneforAll-Deku"
+                            href="https://github.com/OneforAll-Deku/NONO"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="bg-white p-2 border-2 border-black shadow-retro hover:translate-y-[2px] hover:shadow-none transition-all text-black"
