@@ -89,6 +89,7 @@ export default function Dashboard({ session }) {
             }
             const data = await res.json();
             if (Array.isArray(data)) {
+                console.log("Fetched Data:", data);
                 processLogs(data);
             }
         } catch (err) {
@@ -167,6 +168,32 @@ export default function Dashboard({ session }) {
     const getColor = (domain) => {
         const colors = ['bg-retro-accent', 'bg-retro-secondary', 'bg-retro-primary'];
         return colors[domain.length % colors.length];
+    };
+
+    const handleDebugLog = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: session?.user?.id,
+                    logs: [{
+                        domain: "test-debug.com",
+                        duration: 60,
+                        startTime: new Date().toISOString()
+                    }]
+                })
+            });
+            const json = await res.json();
+            if (res.ok) {
+                alert("Debug log sent! Refreshing...");
+                fetchLogs();
+            } else {
+                alert("Debug send failed: " + JSON.stringify(json));
+            }
+        } catch (e) {
+            alert("Debug error: " + e.message);
+        }
     };
 
     const handleExport = () => {
@@ -298,6 +325,12 @@ export default function Dashboard({ session }) {
                         disabled={!logs || logs.length === 0}
                     >
                         <Download size={14} className="mr-2" /> Export
+                    </RetroButton>
+                    <RetroButton
+                        onClick={handleDebugLog}
+                        className="h-10 text-sm whitespace-nowrap !bg-red-500 text-white"
+                    >
+                        TEST DATA
                     </RetroButton>
                 </div>
             </RetroCard>
