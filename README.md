@@ -24,7 +24,7 @@ Since NONO is currently in Beta (and privacy-focused), it is installed manually 
 5.  **Pin It**: Click the puzzle icon in the Chrome toolbar and pin **NONO** so you can see its status.
 
 ### 3. Connect to Dashboard
-1.  **Open the Web App**: Navigate to the NONO Dashboard (e.g., `https://smart-time-tracker.vercel.app` or your deployed URL).
+1.  **Open the Web App**: Navigate to the NONO Dashboard ([https://nono-web.vercel.app/](https://nono-web.vercel.app/)).
 2.  **Sign In**: Log in using your Google account.
 3.  **Activate**: Open the NONO extension popup. It should automatically detect your session and show **"User Portal (Connected)"**.
 
