@@ -287,7 +287,7 @@ export default function Dashboard({ session }) {
                     </div>
 
                     {/* Chart */}
-                    <div className="h-48 w-full border-2 border-black bg-white p-2">
+                    <div className="h-64 w-full border-2 border-black bg-white p-2" style={{ minHeight: '250px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData && chartData.length > 0 ? chartData : [{ name: 'Today', minutes: 0 }]}>
                                 <CartesianGrid strokeDasharray="3 3" />
