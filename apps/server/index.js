@@ -211,6 +211,9 @@ app.post("/api/extension/pair/finish", (req, res) => {
  * - Body: { logs: [...], user_id: "..." }
  */
 app.post("/api/logs", async (req, res) => {
+  console.log("POST /api/logs headers:", req.headers);
+  console.log("POST /api/logs body:", typeof req.body, req.body);
+
   const { logs } = req.body || {};
   const legacyUserId = normalizeString(req.body && req.body.user_id);
   const token = getBearerToken(req);
