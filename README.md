@@ -2,7 +2,7 @@
 
 **NONO** is a privacy-first, automated time-tracking tool that helps you regain control of your digital life. It runs quietly in your browser, respecting your data while giving you brutal/retro-styled insights into your productivity.
 
-![NONO Dashboard](https://placehold.co/600x400/FFB84C/000000?text=NONO+Dashboard)
+![NONO Dashboard](./dashboard-preview.png)
 
 ## 🚀 How to Use NONO (User Guide)
 
@@ -75,4 +75,4 @@ npm run dev
 2.  Click **Load Unpacked**.
 3.  Select the `apps/extension` folder.
 
-For full deployment instructions, please refer to [DEPLOYMENT_PLAN.md](./DEPLOYMENT_PLAN.md).
+For full deployment details, please contact the maintainer.
