@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar, Filter, BarChart2, Zap, Layers, LogOut, CheckSquare, Download } from 'lucide-react';
 import { RetroCard, RetroButton } from '../components/RetroUI';
@@ -16,6 +17,7 @@ function notifyExtensionUserId(userId) {
 }
 
 export default function Dashboard({ session }) {
+    const navigate = useNavigate();
     const [logs, setLogs] = useState([]);
     const [stats, setStats] = useState([]);
     const [totalTime, setTotalTime] = useState(0);
@@ -158,10 +160,15 @@ export default function Dashboard({ session }) {
     };
 
     const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) console.error("Logout error:", error);
-        // App.jsx listens to state change, but we can force it or let the listener handle it.
-        // The listener in App.jsx sets session to null -> render <Navigate to="/login" />.
+        try {
+            await supabase.auth.signOut();
+            // Force verify state change
+            navigate('/login');
+        } catch (error) {
+            console.error("Logout error:", error);
+            // Fallback
+            window.location.href = '/login';
+        }
     };
 
     // ... existing formatDuration, getColor, handleGeneratePairingCode ...
