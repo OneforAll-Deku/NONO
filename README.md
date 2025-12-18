@@ -7,7 +7,7 @@
 ## ⚡ Quick Start
 
 ### 1. Download
-**[Download Latest Extension (ZIP)](https://github.com/OneforAll-Deku/NONO/releases/latest/download/nono-extension.zip)**  
+**[Download Latest Extension (ZIP)](https://github.com/OneforAll-Deku/NONO/raw/main/release/nono-extension.zip)**  
 *(Unzip this file after downloading)*
 
 ### 2. Install
