@@ -255,16 +255,28 @@ app.post("/api/logs", async (req, res) => {
     const { error } = await supabase.from("activity_logs").insert(records);
 
     if (error) {
-      console.error("Supabase Error:", error);
-      return res.status(500).json({ error: error.message });
+      console.error("Supabase Error details:", JSON.stringify(error, null, 2));
+      return res.status(500).json({
+        error: error.message,
+        details: error,
+        hint: "Check server logs for more info"
+      });
     }
 
     console.log(`Saved ${records.length} logs to Supabase for user ${user_id}`);
     res.json({ success: true, inserted: records.length });
   } catch (e) {
-    console.error("Server Error:", e);
-    res.status(500).json({ error: e.message });
+    console.error("Server Exception:", e);
+    res.status(500).json({ error: e.message, stack: e.stack });
   }
+});
+
+app.get("/debug-config", (req, res) => {
+  res.json({
+    supabaseUrlConfigured: !!process.env.SUPABASE_URL,
+    supabaseKeyConfigured: !!process.env.SUPABASE_SERVICE_KEY,
+    port: PORT
+  });
 });
 
 /**
