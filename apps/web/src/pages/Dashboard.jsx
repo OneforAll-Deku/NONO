@@ -163,11 +163,11 @@ export default function Dashboard({ session }) {
         try {
             await supabase.auth.signOut();
             // Force verify state change
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error("Logout error:", error);
             // Fallback
-            window.location.href = '/login';
+            window.location.href = '/';
         }
     };
 
