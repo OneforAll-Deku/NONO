@@ -23,10 +23,8 @@ export default function Dashboard({ session }) {
     const [totalTime, setTotalTime] = useState(0);
     const [chartData, setChartData] = useState([]);
 
-    // New Feature: Hourly Heatmap
     const [hourlyStats, setHourlyStats] = useState([]);
 
-    // Date Filters
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
     const [isExtensionConnected, setIsExtensionConnected] = useState(false);
@@ -71,9 +69,9 @@ export default function Dashboard({ session }) {
 
     useEffect(() => {
         fetchLogs();
-        const interval = setInterval(fetchLogs, 10000); // Poll every 10s
+        const interval = setInterval(fetchLogs, 10000);
         return () => clearInterval(interval);
-    }, [session, dateRange]); // Re-fetch when dateRange changes
+    }, [session, dateRange]);
 
     const [apiError, setApiError] = useState(null);
 
@@ -87,7 +85,6 @@ export default function Dashboard({ session }) {
             const res = await fetch(url);
             if (!res.ok) {
                 const text = await res.text();
-                // Try parsing JSON if possible
                 try {
                     const json = JSON.parse(text);
                     throw new Error(json.error || json.message || "Server Error");
@@ -113,18 +110,15 @@ export default function Dashboard({ session }) {
         const hours = Array(24).fill(0);
 
         data.forEach(log => {
-            // 1. Domain Grouping
             const domain = log.domain;
             if (!grouped[domain]) grouped[domain] = 0;
             grouped[domain] += log.duration;
             total += log.duration;
 
-            // 2. Date Grouping
             const date = log.created_at ? log.created_at.split('T')[0] : new Date().toISOString().split('T')[0];
             if (!timeline[date]) timeline[date] = 0;
             timeline[date] += log.duration;
 
-            // 3. Hour Breakdown (Local Time)
             const d = new Date(log.created_at || new Date());
             const h = d.getHours();
             if (h >= 0 && h < 24) {
@@ -148,13 +142,11 @@ export default function Dashboard({ session }) {
             minutes: Math.round(timeline[date] / 60)
         }));
 
-        // Hourly Data Processing
         const maxHour = Math.max(...hours, 1);
         const hourlyData = hours.map((seconds, h) => ({
             hour: h,
             label: h === 0 ? '12 AM' : h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`,
             seconds,
-            // Calculate intensity 1-5 relative to max, or 0 if empty
             intensity: seconds === 0 ? 0 : Math.ceil((seconds / maxHour) * 5)
         }));
 
@@ -168,16 +160,13 @@ export default function Dashboard({ session }) {
     const handleLogout = async () => {
         try {
             await supabase.auth.signOut();
-            // Force verify state change
             navigate('/');
         } catch (error) {
             console.error("Logout error:", error);
-            // Fallback
             window.location.href = '/';
         }
     };
 
-    // ... existing formatDuration, getColor, handleGeneratePairingCode ...
     const formatDuration = (seconds) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -193,19 +182,16 @@ export default function Dashboard({ session }) {
     const handleExport = () => {
         if (!logs || logs.length === 0) return;
 
-        // CSV Header
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Domain,Duration (Seconds),Date,Time Logged\n";
 
-        // CSV Rows
         logs.forEach(log => {
             const date = log.created_at ? log.created_at.split('T')[0] : '';
             const time = log.created_at ? new Date(log.created_at).toLocaleTimeString() : '';
-            const safeDomain = log.domain.replace(/,/g, ''); // Simple escape
+            const safeDomain = log.domain.replace(/,/g, '');
             csvContent += `${safeDomain},${log.duration},${date},${time}\n`;
         });
 
-        // Download Trigger
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -218,7 +204,6 @@ export default function Dashboard({ session }) {
 
     return (
         <div className="w-full max-w-5xl mx-auto p-6 space-y-8">
-            {/* ... Header ... */}
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-black bg-white inline-block px-2 border-2 border-retro-border shadow-retro-hover transform -rotate-1">
@@ -238,7 +223,6 @@ export default function Dashboard({ session }) {
                 </div>
             </div>
 
-            {/* ... Connection Status ... */}
             {isExtensionConnected ? (
                 <div className="bg-green-100 border-2 border-black p-4 mb-4 space-y-4 shadow-retro">
                     <div>
@@ -266,7 +250,6 @@ export default function Dashboard({ session }) {
                 </div>
             )}
 
-            {/* API Error Banner - Debugging */}
             {apiError && (
                 <div className="bg-red-500 text-white border-2 border-black p-4 mb-8 shadow-retro animate-pulse">
                     <h3 className="font-black text-lg uppercase flex items-center gap-2">
@@ -279,7 +262,6 @@ export default function Dashboard({ session }) {
                 </div>
             )}
 
-            {/* Filters */}
             <RetroCard>
                 <div className="flex flex-col sm:flex-row gap-4 items-end">
                     <div className="flex-1 w-full">
@@ -323,9 +305,7 @@ export default function Dashboard({ session }) {
                 </div>
             </RetroCard>
 
-            {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Main Stats */}
                 <RetroCard className="md:col-span-2 space-y-6">
                     <div className="flex items-center justify-between border-b-2 border-retro-border pb-4">
                         <h2 className="text-xl font-bold flex items-center gap-2">
@@ -334,7 +314,6 @@ export default function Dashboard({ session }) {
                         <span className="font-mono font-bold text-2xl">{formatDuration(totalTime)}</span>
                     </div>
 
-                    {/* Chart */}
                     <div className="h-64 w-full border-2 border-black bg-white p-2" style={{ minHeight: '250px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData && chartData.length > 0 ? chartData : [{ name: 'Today', minutes: 0 }]}>
@@ -372,7 +351,6 @@ export default function Dashboard({ session }) {
                     </div>
                 </RetroCard>
 
-                {/* Side Stats */}
                 <div className="space-y-6">
                     <RetroCard className="!bg-retro-secondary text-white">
                         <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
@@ -383,7 +361,6 @@ export default function Dashboard({ session }) {
                         </div>
                     </RetroCard>
 
-                    {/* New Peak Hours Card */}
                     <RetroCard>
                         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                             Peak Hours (24H)
@@ -391,12 +368,10 @@ export default function Dashboard({ session }) {
                         <div className="h-32 flex items-end justify-between gap-[2px] w-full">
                             {hourlyStats.length > 0 ? hourlyStats.map((stat) => (
                                 <div key={stat.hour} className="flex-1 flex flex-col justify-end items-center group relative h-full">
-                                    {/* Tooltip */}
                                     <div className="hidden group-hover:block absolute bottom-full mb-1 bg-black text-white text-[10px] px-1 py-0.5 whitespace-nowrap z-20 font-mono pointer-events-none">
                                         {stat.label}: {Math.round(stat.seconds / 60)}m
                                     </div>
 
-                                    {/* Bar - Use green intensities */}
                                     <div
                                         className={`w-full transition-all duration-300 hover:opacity-80
                                             ${stat.intensity === 0 ? 'bg-gray-100 h-px' : ''}

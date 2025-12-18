@@ -1,7 +1,3 @@
-/**
- * Smart Time Tracker - Server
- */
-
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -19,27 +15,11 @@ app.use(
 );
 app.use(bodyParser.json());
 
-/**
- * -----------------------------
- * In-memory stores (DEV ONLY)
- * -----------------------------
- *
- * pairingCodes: code -> { user_id, expiresAtMs }
- * tokens: token -> { user_id, createdAtMs }
- *
- * If you restart the server, all pairings/tokens are lost.
- */
 const pairingCodes = new Map();
 const tokens = new Map();
 
-const PAIR_CODE_TTL_MS = 2 * 60 * 1000; // 2 minutes
-const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days (dev-friendly)
-
-/**
- * -----------------------------
- * Helpers
- * -----------------------------
- */
+const PAIR_CODE_TTL_MS = 2 * 60 * 1000;
+const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 function nowMs() {
   return Date.now();
@@ -50,20 +30,17 @@ function normalizeString(value) {
 }
 
 function isLikelyUuid(value) {
-  // Loose UUID v4-ish check (do not hard-require)
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     value,
   );
 }
 
 function randomPairCode6() {
-  // 6 digits, avoids leading zeros issues by padding
   const n = crypto.randomInt(0, 1_000_000);
   return String(n).padStart(6, "0");
 }
 
 function randomToken() {
-  // 32 bytes => 64 hex chars
   return crypto.randomBytes(32).toString("hex");
 }
 
@@ -83,9 +60,6 @@ function cleanupExpired() {
   }
 }
 
-/**
- * Extracts Bearer token from Authorization header.
- */
 function getBearerToken(req) {
   const header = req.headers && (req.headers.authorization || req.headers.Authorization);
   const value = Array.isArray(header) ? header[0] : header;
@@ -95,10 +69,6 @@ function getBearerToken(req) {
   return m ? normalizeString(m[1]) : "";
 }
 
-/**
- * Middleware: authenticate extension requests via token.
- * Sets req.extensionUserId if valid, else returns 401.
- */
 function requireExtensionAuth(req, res, next) {
   cleanupExpired();
 
@@ -116,33 +86,14 @@ function requireExtensionAuth(req, res, next) {
   next();
 }
 
-/**
- * -----------------------------
- * Pairing API (Option A)
- * -----------------------------
- */
-
-/**
- * POST /api/extension/pair/start
- *
- * Dashboard calls this after user signs in.
- * Body: { user_id: "<supabase_user_id>" }
- *
- * Returns: { pair_code, expires_in_seconds }
- *
- * NOTE: In production you should not trust `user_id` from the client.
- * You should verify the Supabase session JWT and derive the user id server-side.
- */
 app.post("/api/extension/pair/start", (req, res) => {
   cleanupExpired();
 
   const user_id = normalizeString(req.body && req.body.user_id);
   if (!user_id) return res.status(400).json({ error: "Missing user_id" });
 
-  // Keep loose validation: allow any non-trivial id string
   if (user_id.length < 6) return res.status(400).json({ error: "Invalid user_id" });
 
-  // Ensure code uniqueness (retry a few times)
   let code = "";
   for (let i = 0; i < 5; i++) {
     const candidate = randomPairCode6();
@@ -166,14 +117,6 @@ app.post("/api/extension/pair/start", (req, res) => {
   });
 });
 
-/**
- * POST /api/extension/pair/finish
- *
- * Extension calls this with the code typed by the user.
- * Body: { pair_code: "123456" }
- *
- * Returns: { extension_token, user_id, token_expires_in_seconds }
- */
 app.post("/api/extension/pair/finish", (req, res) => {
   cleanupExpired();
 
@@ -183,7 +126,6 @@ app.post("/api/extension/pair/finish", (req, res) => {
   const entry = pairingCodes.get(pair_code);
   if (!entry) return res.status(400).json({ error: "Invalid or expired pair_code" });
 
-  // consume the code (one-time)
   pairingCodes.delete(pair_code);
 
   const token = randomToken();
@@ -198,18 +140,6 @@ app.post("/api/extension/pair/finish", (req, res) => {
   });
 });
 
-/**
- * -----------------------------
- * Log ingestion
- * -----------------------------
- *
- * Preferred (new):
- * - Extension sends Authorization: Bearer <extension_token>
- * - Body: { logs: [...] }
- *
- * Legacy (old):
- * - Body: { logs: [...], user_id: "..." }
- */
 app.post("/api/logs", async (req, res) => {
   console.log("POST /api/logs headers:", req.headers);
   console.log("POST /api/logs body:", typeof req.body, req.body);
@@ -226,7 +156,6 @@ app.post("/api/logs", async (req, res) => {
 
   let user_id = "";
 
-  // Prefer token if present
   if (token) {
     const tokenEntry = tokens.get(token);
     if (!tokenEntry || !tokenEntry.user_id) {
@@ -234,7 +163,6 @@ app.post("/api/logs", async (req, res) => {
     }
     user_id = tokenEntry.user_id;
   } else if (legacyUserId) {
-    // Fallback: legacy user_id flow
     user_id = legacyUserId;
   }
 
@@ -282,14 +210,6 @@ app.get("/debug-config", (req, res) => {
   });
 });
 
-/**
- * -----------------------------
- * Log fetch (dashboard)
- * -----------------------------
- *
- * Kept as-is for compatibility with your current Dashboard.jsx.
- * For production, prefer using Supabase client with RLS or verify JWT on this endpoint.
- */
 app.get("/api/logs", async (req, res) => {
   const user_id = normalizeString(req.query && req.query.user_id);
   const startDate = normalizeString(req.query && req.query.start_date);
@@ -300,19 +220,13 @@ app.get("/api/logs", async (req, res) => {
     query = query.eq("user_id", user_id);
   }
 
-  // Date filtering
   if (startDate) {
-    // start_date is typically YYYY-MM-DD
     query = query.gte("created_at", `${startDate}T00:00:00.000Z`);
   }
   if (endDate) {
-    // end_date is typically YYYY-MM-DD
     query = query.lte("created_at", `${endDate}T23:59:59.999Z`);
   }
 
-  // Default limit to prevent overflow if no date range is specified
-  // If date range IS specified, we might want more data, but let's cap at 1000 safely
-  // or logic: if dates provided, limit 2000, else 200
   const limit = (startDate || endDate) ? 2000 : 200;
   query = query.order("created_at", { ascending: false }).limit(limit);
 
@@ -321,9 +235,6 @@ app.get("/api/logs", async (req, res) => {
   res.json(data);
 });
 
-/**
- * Optional: health endpoint
- */
 app.get("/health", (_req, res) => {
   cleanupExpired();
   res.json({

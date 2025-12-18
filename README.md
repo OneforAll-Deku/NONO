@@ -2,7 +2,7 @@
 
 **NONO** is a privacy-first, automated time-tracking tool that helps you regain control of your digital life. It runs quietly in your browser, respecting your data while giving you brutal/retro-styled insights into your productivity.
 
-![NONO Demo](./gif/NONO.gif)
+![NONO Dashboard](./dashboard-cover.png)
 
 ## ⚡ Quick Start
 

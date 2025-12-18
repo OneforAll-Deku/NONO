@@ -1,8 +1,3 @@
-/**
- * Smart Time Tracker - Background Service Worker (Manifest V3)
- */
-
-// Sync every 30 seconds
 chrome.alarms.create("syncLogs", { periodInMinutes: 0.5 });
 
 function logPrefix() {
@@ -29,7 +24,6 @@ function isValidUserId(value) {
   return id.length >= 6;
 }
 
-// ---- Messages (from content script) ----
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request && request.type === "SET_USER_ID") {
     const incoming = normalizeUserId(request.user_id);
@@ -40,7 +34,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     chrome.storage.local.get(["user_id"], (result) => {
-      // Just save it
       chrome.storage.local.set({ user_id: incoming }, () => {
         console.log(logPrefix(), "User ID updated:", incoming);
         sendResponse({ success: true });
@@ -51,16 +44,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return false;
 });
 
-// ---- State Management (Persisted) ----
-// In MV3, global variables are volatile. We must use storage.
-
 async function getActiveSession() {
   const data = await chrome.storage.local.get(["activeSession"]);
   return data.activeSession || null;
 }
 
 async function setActiveSession(session) {
-  // session: { domain, startTime } or null
   if (session) {
     await chrome.storage.local.set({ activeSession: session });
   } else {
@@ -68,7 +57,6 @@ async function setActiveSession(session) {
   }
 }
 
-// ---- Tracking: tab + idle ----
 chrome.tabs.onActivated.addListener((activeInfo) => {
   handleTabChange(activeInfo.tabId);
 });
@@ -96,12 +84,10 @@ async function handleTabChange(newTabId) {
     const tab = await chrome.tabs.get(newTabId);
     if (!tab || !tab.url) return;
 
-    // Ignore internal pages
     if (tab.url.startsWith('chrome://') || tab.url.startsWith('edge://') || tab.url.startsWith('about:')) return;
 
     const domain = new URL(tab.url).hostname;
 
-    // Start new session
     const session = {
       domain,
       startTime: Date.now()
@@ -122,7 +108,7 @@ async function closeCurrentSession() {
   if (!domain || !startTime) return;
 
   const duration = (Date.now() - startTime) / 1000;
-  if (duration < 1) return; // Ignore brief switches
+  if (duration < 1) return;
 
   const log = {
     domain,
@@ -136,10 +122,8 @@ async function closeCurrentSession() {
     logs.push(log);
     await chrome.storage.local.set({ logs });
 
-    // Clear active session so we don't double-log
     await setActiveSession(null);
 
-    // Trigger near-immediate sync
     chrome.alarms.create("syncLogs", { when: Date.now() + 100 });
 
     console.log(logPrefix(), "Logged:", log);
@@ -148,7 +132,6 @@ async function closeCurrentSession() {
   }
 }
 
-// ---- Sync logs to server ----
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (!alarm || alarm.name !== "syncLogs") return;
 
@@ -157,14 +140,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     async (result) => {
       const logs = result && Array.isArray(result.logs) ? result.logs : [];
       const extension_token = normalizeToken(result && result.extension_token);
-      const user_id = normalizeUserId(result && result.user_id); // legacy fallback only
+      const user_id = normalizeUserId(result && result.user_id);
 
       if (logs.length === 0) return;
 
-      // Preferred: token-based auth
       if (!isValidToken(extension_token)) {
-        // Legacy fallback: if you still want to support user_id uploads, keep this branch.
-        // Otherwise, you can remove the fallback and simply return.
         if (!isValidUserId(user_id)) {
           console.warn(
             logPrefix(),
@@ -182,15 +162,12 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       try {
         const headers = { "Content-Type": "application/json" };
 
-        // If token exists, use Authorization header and omit user_id from body.
-        // If token is missing, fall back to legacy body { logs, user_id }.
         const useToken = isValidToken(extension_token);
 
         if (useToken) {
           headers.Authorization = `Bearer ${extension_token}`;
         }
 
-        // Force legacy user_id inclusion if available, as a fail-safe
         const body = { logs, user_id: useToken ? undefined : user_id };
         if (user_id && !body.user_id) body.user_id = user_id;
 
@@ -230,7 +207,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
           "Failed to sync. Server likely down or blocking.",
           error,
         );
-        // keep logs for retry
       }
     },
   );
