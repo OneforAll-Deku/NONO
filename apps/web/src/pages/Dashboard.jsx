@@ -157,6 +157,13 @@ export default function Dashboard({ session }) {
         setHourlyStats(hourlyData);
     };
 
+    const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error("Logout error:", error);
+        // App.jsx listens to state change, but we can force it or let the listener handle it.
+        // The listener in App.jsx sets session to null -> render <Navigate to="/login" />.
+    };
+
     // ... existing formatDuration, getColor, handleGeneratePairingCode ...
     const formatDuration = (seconds) => {
         const h = Math.floor(seconds / 3600);
@@ -212,7 +219,7 @@ export default function Dashboard({ session }) {
                     <div className="bg-white border-2 border-black p-2 font-mono text-xs">
                         ID: {session?.user?.id.slice(0, 8)}...
                     </div>
-                    <RetroButton onClick={() => supabase.auth.signOut()} className="!py-1 !px-3 text-sm">
+                    <RetroButton onClick={handleLogout} className="!py-1 !px-3 text-sm">
                         <LogOut size={16} />
                     </RetroButton>
                 </div>
