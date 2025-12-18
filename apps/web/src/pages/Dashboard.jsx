@@ -67,19 +67,33 @@ export default function Dashboard({ session }) {
         return () => clearInterval(interval);
     }, [session, dateRange]); // Re-fetch when dateRange changes
 
+    const [apiError, setApiError] = useState(null);
+
     const fetchLogs = async () => {
         try {
+            setApiError(null);
             let url = `${import.meta.env.VITE_API_URL}/api/logs?user_id=${session?.user?.id}`;
             if (dateRange.start) url += `&start_date=${dateRange.start}`;
             if (dateRange.end) url += `&end_date=${dateRange.end}`;
 
             const res = await fetch(url);
+            if (!res.ok) {
+                const text = await res.text();
+                // Try parsing JSON if possible
+                try {
+                    const json = JSON.parse(text);
+                    throw new Error(json.error || json.message || "Server Error");
+                } catch (e) {
+                    throw new Error(text || `Server Error: ${res.status}`);
+                }
+            }
             const data = await res.json();
             if (Array.isArray(data)) {
                 processLogs(data);
             }
         } catch (err) {
             console.error('Failed to fetch logs:', err);
+            setApiError(err.message);
         }
     };
 
@@ -228,6 +242,19 @@ export default function Dashboard({ session }) {
                     <div className="text-sm font-bold text-gray-700">
                         Once installed, just reload this page and it should connect automatically.
                     </div>
+                </div>
+            )}
+
+            {/* API Error Banner - Debugging */}
+            {apiError && (
+                <div className="bg-red-500 text-white border-2 border-black p-4 mb-8 shadow-retro animate-pulse">
+                    <h3 className="font-black text-lg uppercase flex items-center gap-2">
+                        <LogOut size={20} className="rotate-180" /> System Error
+                    </h3>
+                    <p className="font-bold font-mono mt-2">{apiError}</p>
+                    <p className="text-xs mt-2 opacity-80">
+                        If this says "relation does not exist", you need to run the Supabase SQL Setup.
+                    </p>
                 </div>
             )}
 
