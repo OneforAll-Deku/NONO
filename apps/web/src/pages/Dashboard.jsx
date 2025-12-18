@@ -32,6 +32,12 @@ export default function Dashboard({ session }) {
     const [isExtensionConnected, setIsExtensionConnected] = useState(false);
 
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('logout') === 'true') {
+            handleLogout();
+            return;
+        }
+
         const userId = session?.user?.id;
         if (!userId) return;
         document.body.setAttribute('data-smart-tracker-user-id', userId);

@@ -128,6 +128,8 @@ function clearAuth() {
   chrome.storage.local.remove(["extension_token", "user_id"], () => {
     setPairingStatus("Signed out.", "info");
     renderFromStorage();
+    // Open web app with logout param to prevent auto-relogin loop
+    chrome.tabs.create({ url: DASHBOARD_URL + "dashboard?logout=true" });
   });
 }
 
