@@ -2,33 +2,23 @@
 
 **NONO** is a privacy-first, automated time-tracking tool that helps you regain control of your digital life. It runs quietly in your browser, respecting your data while giving you brutal/retro-styled insights into your productivity.
 
-![NONO Dashboard](./dashboard-preview.png)
+![NONO Demo](./gif/NONO.gif)
 
-## 🚀 How to Use NONO (User Guide)
+## ⚡ Quick Start
 
-Follow these simple steps to start tracking your time.
+### 1. Download
+**[Click here to download the Extension ZIP](./release/nono-extension.zip)**  
+*(Unzip this file after downloading)*
 
-### 1. Download the Extension
-Download the latest version of the extension from the **Releases** section of this repository, or use the link below if available.
+### 2. Install
+1.  Open Chrome and type `chrome://extensions` in the address bar.
+2.  Turn on **Developer mode** (top right switch).
+3.  Drag and drop the unzipped folder into the page.
 
-- **[Download Extension ZIP](./release/nono-extension.zip)** 
-*(Make sure to unzip this file after downloading)*
-
-### 2. Install in Chrome
-Since NONO is currently in Beta (and privacy-focused), it is installed manually to give you full control.
-
-1.  **Unzip the File**: Extract the downloaded ZIP file. You will see a folder containing the extension files.
-2.  **Open Extensions Page**: Open Google Chrome and paste `chrome://extensions` into the address bar.
-3.  **Enable Developer Mode**: Toggle the "Developer mode" switch in the top-right corner of the page.
-4.  **Drag & Drop**: Drag the unzipped folder directly onto the Chrome Extensions page.
-5.  **Pin It**: Click the puzzle icon in the Chrome toolbar and pin **NONO** so you can see its status.
-
-### 3. Connect to Dashboard
-1.  **Open the Web App**: Navigate to the NONO Dashboard ([https://nono-web.vercel.app/](https://nono-web.vercel.app/)).
-2.  **Sign In**: Log in using your Google account.
-3.  **Activate**: Open the NONO extension popup. It should automatically detect your session and show **"User Portal (Connected)"**.
-
-**You are all set!** Browse the web as usual. NONO will track your active tabs and present your data on the dashboard.
+### 3. Go
+1.  **[Open Dashboard](https://nono-web.vercel.app/)** and Sign In.
+2.  Pin the NONO extension 🧩 to see your status.
+3.  That's it! Just browse the web, and your stats will appear automatically.
 
 ---
 
