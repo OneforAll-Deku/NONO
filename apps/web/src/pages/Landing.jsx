@@ -285,7 +285,7 @@ export default function Landing() {
             {/* Footer */}
             <footer className="w-full max-w-6xl mx-auto p-10 text-center">
                 <h2 className="text-3xl font-black mb-8">Ready to reclaim your time?</h2>
-                <RetroButton onClick={() => navigate('/login')} className="bg-retro-accent text-white px-8 py-3 text-lg">
+                <RetroButton onClick={() => window.open('https://github.com/OneforAll-Deku/NONO', '_blank')} className="bg-retro-accent text-white px-8 py-3 text-lg">
                     Join the Beta
                 </RetroButton>
                 <div className="mt-12 flex flex-col items-center gap-4">
