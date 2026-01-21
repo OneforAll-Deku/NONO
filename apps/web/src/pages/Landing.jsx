@@ -20,12 +20,13 @@ const staggerContainer = {
 
 export default function Landing() {
     const navigate = useNavigate();
-    const [stats, setStats] = useState({ count: 0, gmailCount: 0, newToday: 0 });
+    const [stats, setStats] = useState({ count: 0, gmailCount: 0, newToday: 0, visitCount: 0 });
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/stats/user-count`);
+                // Add timestamp to prevent caching
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/stats/user-count?t=${Date.now()}`);
                 if (res.ok) {
                     const data = await res.json();
                     setStats(data);
@@ -34,7 +35,17 @@ export default function Landing() {
                 console.error("Failed to fetch stats:", err);
             }
         };
+
+        const recordVisit = async () => {
+            try {
+                await fetch(`${import.meta.env.VITE_API_URL}/api/stats/visit`, { method: 'POST' });
+            } catch (err) {
+                console.error("Failed to record visit:", err);
+            }
+        };
+
         fetchStats();
+        recordVisit();
     }, []);
 
     const userCount = stats.count;
@@ -183,7 +194,7 @@ export default function Landing() {
                             <span className="text-2xl font-black uppercase text-retro-accent">🔥 {userCount + 150} DISTRACTION KILLERS</span>
                             <span className="text-2xl font-black uppercase text-retro-secondary">⚡ {stats.gmailCount + 80} GOOGLE SIGN-INS</span>
                             <span className="text-2xl font-black uppercase text-retro-primary">🔋 {stats.newToday + 5} JOINED TODAY</span>
-                            <span className="text-2xl font-black uppercase text-green-500">✅ 100% PRIVACY FIRST</span>
+                            <span className="text-2xl font-black uppercase text-green-500">👀 {stats.visitCount + 1000} TOTAL VISITS</span>
                             <span className="text-2xl font-black uppercase text-retro-accent">💎 {userCount + 150} DISTRACTION KILLERS</span>
                         </div>
                     ))}

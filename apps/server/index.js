@@ -226,8 +226,7 @@ app.get("/api/stats/user-count", async (req, res) => {
 
     if (totalError) throw totalError;
 
-    // Gmail/Google users (if user.email ends with gmail.com)
-    // In a real app, we might check user metadata, but email check is simple for now.
+    // Gmail/Google users
     const { count: gmailCount, error: gmailError } = await supabase
       .from("users")
       .select("*", { count: "exact", head: true })
@@ -239,15 +238,33 @@ app.get("/api/stats/user-count", async (req, res) => {
       .select("*", { count: "exact", head: true })
       .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
+    // Fetch site visits
+    const { data: statsData, error: statsError } = await supabase
+      .from("site_stats")
+      .select("visit_count")
+      .eq("id", "global")
+      .single();
+
     res.json({
       count: total || 0,
       gmailCount: gmailCount || 0,
       newToday: newToday || 0,
+      visitCount: statsData?.visit_count || 0,
       status: "online"
     });
   } catch (err) {
-    console.error("Error fetching user count:", err);
-    res.status(500).json({ error: "Failed to fetch user count" });
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+app.post("/api/stats/visit", async (req, res) => {
+  try {
+    await supabase.rpc("increment_visit_count");
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error incrementing visits:", err);
+    res.status(500).json({ error: "Failed to record visit" });
   }
 });
 
