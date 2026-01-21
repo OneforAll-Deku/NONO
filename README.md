@@ -40,7 +40,7 @@ If you want to contribute to NONO or run the full stack locally, follow the guid
 ### Tech Stack
 -   **Extension**: Manifest V3, Vanilla JS
 -   **Frontend**: React 19, Vite, Tailwind CSS v4
--   **Backend**: Node.js, Express, Supabase
+-   **Backend**: Node.js, Express, Supabase (PostgreSQL)
 
 ### Local Development Setup
 
