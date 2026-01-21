@@ -302,41 +302,6 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.post("/api/logs/all/clear", async (req, res) => {
-  const user_id = normalizeString(req.body && req.body.user_id);
-  if (!user_id) return res.status(400).json({ error: "Missing user_id" });
-
-  try {
-    const { error } = await supabase.from("activity_logs").delete().eq("user_id", user_id);
-    if (error) throw error;
-    res.json({ success: true, message: "All logs cleared" });
-  } catch (err) {
-    console.error("Panic Delete Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/api/logs/category", async (req, res) => {
-  const { user_id, domain, category } = req.body || {};
-  if (!user_id || !domain || !category) {
-    return res.status(400).json({ error: "Missing user_id, domain or category" });
-  }
-
-  try {
-    const { error } = await supabase
-      .from("activity_logs")
-      .update({ category })
-      .eq("user_id", user_id)
-      .eq("domain", domain);
-
-    if (error) throw error;
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Update Category Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 app.get("/", (req, res) => {
   res.send("NONO Smart Time Tracker API is running!");
 });

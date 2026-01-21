@@ -21,7 +21,6 @@ export default function Dashboard({ session }) {
     const [logs, setLogs] = useState([]);
     const [stats, setStats] = useState([]);
     const [totalTime, setTotalTime] = useState(0);
-    const [lastWeekTotal, setLastWeekTotal] = useState(0);
     const [chartData, setChartData] = useState([]);
 
     const [hourlyStats, setHourlyStats] = useState([]);
@@ -128,62 +127,34 @@ export default function Dashboard({ session }) {
         });
 
         const sortedStats = Object.keys(grouped)
-            .map(domain => {
-                const logsForDomain = data.filter(l => l.domain === domain);
-                const category = logsForDomain[0]?.category || 'PROD';
-                return {
-                    app: domain,
-                    duration: grouped[domain],
-                    time: formatDuration(grouped[domain]),
-                    percent: total > 0 ? Math.round((grouped[domain] / total) * 100) : 0,
-                    color: category === 'DISTRACT' ? 'bg-red-400' : getColor(domain),
-                    category
-                };
-            })
+            .map(domain => ({
+                app: domain,
+                duration: grouped[domain],
+                time: formatDuration(grouped[domain]),
+                percent: total > 0 ? Math.round((grouped[domain] / total) * 100) : 0,
+                color: getColor(domain)
+            }))
             .sort((a, b) => b.duration - a.duration)
             .slice(0, 5);
 
-        // Simple mock for last week comparison
-        setLastWeekTotal(total * 0.85);
+        const chart = Object.keys(timeline).sort().map(date => ({
+            name: date,
+            minutes: Math.round(timeline[date] / 60)
+        }));
+
+        const maxHour = Math.max(...hours, 1);
+        const hourlyData = hours.map((seconds, h) => ({
+            hour: h,
+            label: h === 0 ? '12 AM' : h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`,
+            seconds,
+            intensity: seconds === 0 ? 0 : Math.ceil((seconds / maxHour) * 5)
+        }));
 
         setStats(sortedStats);
         setTotalTime(total);
         setLogs(data);
         setChartData(chart);
         setHourlyStats(hourlyData);
-    };
-
-    const handlePanic = async () => {
-        if (!confirm("🚨 WARNING: This will PERMANENTLY delete all your tracking data. Are you sure?")) return;
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/logs/all/clear`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: session?.user?.id })
-            });
-            if (res.ok) {
-                setLogs([]);
-                setStats([]);
-                setTotalTime(0);
-                alert("All data wiped successfully.");
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const toggleCategory = async (domain, current) => {
-        const next = current === 'PROD' ? 'DISTRACT' : 'PROD';
-        try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/logs/category`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: session?.user?.id, domain, category: next })
-            });
-            fetchLogs(); // Refresh
-        } catch (err) {
-            console.error(err);
-        }
     };
 
     const handleLogout = async () => {
@@ -243,9 +214,6 @@ export default function Dashboard({ session }) {
                     </p>
                 </div>
                 <div className="flex gap-4 items-center">
-                    <RetroButton onClick={handlePanic} variant="white" className="!py-1 !px-3 text-sm text-red-600 border-red-600">
-                        PANIC MODE
-                    </RetroButton>
                     <div className="bg-white border-2 border-black p-2 font-mono text-xs">
                         ID: {session?.user?.id.slice(0, 8)}...
                     </div>
@@ -368,15 +336,7 @@ export default function Dashboard({ session }) {
                             stats.map((item) => (
                                 <div key={item.app} className="space-y-1">
                                     <div className="flex justify-between font-bold text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <span>{item.app}</span>
-                                            <button
-                                                onClick={() => toggleCategory(item.app, item.category)}
-                                                className={`text-[10px] px-1 border border-black ${item.category === 'DISTRACT' ? 'bg-red-200' : 'bg-green-100'}`}
-                                            >
-                                                {item.category === 'DISTRACT' ? 'DISTRACTION' : 'FOCUS'}
-                                            </button>
-                                        </div>
+                                        <span>{item.app}</span>
                                         <span>{item.time}</span>
                                     </div>
                                     <div className="w-full h-8 border-2 border-retro-border bg-white relative p-1">
@@ -397,10 +357,7 @@ export default function Dashboard({ session }) {
                             <Zap /> Productivity Pulse
                         </h3>
                         <div className="text-5xl font-black mb-2">
-                            {totalTime > 0 ? (Math.round((stats.filter(s => s.category === 'PROD').length / (stats.length || 1)) * 80) + 20) + '%' : '-%'}
-                        </div>
-                        <div className="text-xs font-bold uppercase opacity-80">
-                            ↑ {Math.round(((totalTime - lastWeekTotal) / (lastWeekTotal || 1)) * 100)}% VS LAST WEEK
+                            {totalTime > 0 ? (Math.round((stats.length / (logs.length || 1)) * 80) + 20) + '%' : '-%'}
                         </div>
                     </RetroCard>
 
