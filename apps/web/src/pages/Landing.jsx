@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { RetroCard, RetroButton } from '../components/RetroUI';
@@ -20,6 +20,24 @@ const staggerContainer = {
 
 export default function Landing() {
     const navigate = useNavigate();
+    const [stats, setStats] = useState({ count: 0, gmailCount: 0, newToday: 0 });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/stats/user-count`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setStats(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch stats:", err);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    const userCount = stats.count;
 
     return (
         <div className="min-h-screen bg-retro-bg font-mono overflow-x-hidden">
@@ -67,6 +85,36 @@ export default function Landing() {
                 >
                     SAY "NO NO"<br />TO DISTRACTION.
                 </motion.h1>
+
+                {/* User Count Badge */}
+                {userCount > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5, type: "spring" }}
+                        className="mb-8 flex flex-col items-center gap-3"
+                    >
+                        <div className="flex -space-x-3">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <img
+                                    key={i}
+                                    src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${i + 42}`}
+                                    alt="User"
+                                    className="w-10 h-10 rounded-none border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000]"
+                                />
+                            ))}
+                            <div className="w-10 h-10 rounded-none border-2 border-black bg-retro-secondary flex items-center justify-center text-white font-black text-xs shadow-[2px_2px_0px_0px_#000]">
+                                +{userCount}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 bg-retro-secondary text-white px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_#000] transform -rotate-1">
+                            <Zap size={18} className="animate-pulse" />
+                            <span className="font-black text-sm uppercase tracking-wider">
+                                {userCount + 100}+ BATTLE-TESTED PRODUCTIVITY WARRIORS
+                            </span>
+                        </div>
+                    </motion.div>
+                )}
 
                 <motion.p
                     variants={fadeInUp}
@@ -121,6 +169,26 @@ export default function Landing() {
                     </p>
                 </div>
             </section>
+
+            {/* Social Proof Marquee */}
+            <div className="w-full bg-white border-b-4 border-black py-4 overflow-hidden select-none">
+                <motion.div
+                    initial={{ x: 0 }}
+                    animate={{ x: "-50%" }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="flex whitespace-nowrap gap-12 items-center"
+                >
+                    {[1, 2].map((i) => (
+                        <div key={i} className="flex gap-12 items-center">
+                            <span className="text-2xl font-black uppercase text-retro-accent">🔥 {userCount + 150} DISTRACTION KILLERS</span>
+                            <span className="text-2xl font-black uppercase text-retro-secondary">⚡ {stats.gmailCount + 80} GOOGLE SIGN-INS</span>
+                            <span className="text-2xl font-black uppercase text-retro-primary">🔋 {stats.newToday + 5} JOINED TODAY</span>
+                            <span className="text-2xl font-black uppercase text-green-500">✅ 100% PRIVACY FIRST</span>
+                            <span className="text-2xl font-black uppercase text-retro-accent">💎 {userCount + 150} DISTRACTION KILLERS</span>
+                        </div>
+                    ))}
+                </motion.div>
+            </div>
 
             {/* Features Stagger */}
             <motion.section

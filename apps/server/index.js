@@ -203,11 +203,52 @@ app.post("/api/logs", async (req, res) => {
 });
 
 app.get("/debug-config", (req, res) => {
+  const url = process.env.SUPABASE_URL || '';
+  const key = process.env.SUPABASE_SERVICE_KEY || '';
   res.json({
-    supabaseUrlConfigured: !!process.env.SUPABASE_URL,
-    supabaseKeyConfigured: !!process.env.SUPABASE_SERVICE_KEY,
-    port: PORT
+    supabaseUrlConfigured: !!url,
+    urlLength: url.length,
+    urlStart: url.substring(0, 15),
+    supabaseKeyConfigured: !!key,
+    keyLength: key.length,
+    keyType: key.startsWith('eyJ') ? 'service_role/JWT' : 'unknown',
+    port: PORT,
+    envNames: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
   });
+});
+
+app.get("/api/stats/user-count", async (req, res) => {
+  try {
+    // Total users
+    const { count: total, error: totalError } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
+
+    if (totalError) throw totalError;
+
+    // Gmail/Google users (if user.email ends with gmail.com)
+    // In a real app, we might check user metadata, but email check is simple for now.
+    const { count: gmailCount, error: gmailError } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true })
+      .ilike("email", "%@gmail.com");
+
+    // New users in last 24 hours
+    const { count: newToday, error: newError } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+    res.json({
+      count: total || 0,
+      gmailCount: gmailCount || 0,
+      newToday: newToday || 0,
+      status: "online"
+    });
+  } catch (err) {
+    console.error("Error fetching user count:", err);
+    res.status(500).json({ error: "Failed to fetch user count" });
+  }
 });
 
 app.get("/api/logs", async (req, res) => {
