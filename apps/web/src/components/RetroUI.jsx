@@ -9,7 +9,20 @@ export function RetroCard({ children, className }) {
     );
 }
 
-export function RetroButton({ children, onClick, className, variant = 'primary' }) {
+export function RetroButton({ children, onClick, className, variant = 'primary', disabled }) {
+    const playClick = () => {
+        try {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+            audio.volume = 0.4;
+            audio.play();
+        } catch (e) { }
+    };
+
+    const handleClick = (e) => {
+        playClick();
+        if (onClick) onClick(e);
+    };
+
     const bgColors = {
         primary: 'bg-retro-primary',
         secondary: 'bg-retro-secondary',
@@ -19,9 +32,10 @@ export function RetroButton({ children, onClick, className, variant = 'primary' 
 
     return (
         <button
-            onClick={onClick}
+            onClick={handleClick}
+            disabled={disabled}
             className={classNames(
-                "px-6 py-2 border-2 border-retro-border shadow-retro font-bold uppercase transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-retro-hover hover:brightness-105",
+                "px-6 py-2 border-2 border-retro-border shadow-retro font-bold uppercase transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-retro-hover active:scale-[0.98] hover:brightness-105 disabled:opacity-50",
                 bgColors[variant],
                 className
             )}

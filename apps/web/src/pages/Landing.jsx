@@ -57,7 +57,7 @@ export default function Landing() {
                 <motion.div
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    className="flex items-center gap-3 transform -rotate-2"
+                    className="flex items-center gap-3 transform -rotate-2 glitch-hover cursor-pointer"
                 >
                     <img src="/nono.png" alt="Logo" className="w-10 h-10 border-2 border-black shadow-retro" />
                     <span className="text-2xl font-black bg-white inline-block px-2 border-2 border-black shadow-retro">
@@ -232,7 +232,7 @@ export default function Landing() {
                 </motion.div>
 
                 <motion.div variants={fadeInUp}>
-                    <RetroCard className="h-full hover:translate-y-[-5px] transition-transform">
+                    <RetroCard className="h-full hover:translate-y-[-5px] transition-transform group relative overflow-hidden">
                         <div className="bg-retro-primary text-black w-12 h-12 flex items-center justify-center border-2 border-black shadow-retro mb-4">
                             <Shield />
                         </div>
@@ -240,6 +240,19 @@ export default function Landing() {
                         <p className="text-sm font-bold text-gray-600">
                             Your data lives locally and is only synced when you say so. No creepy spying.
                         </p>
+
+                        {/* Interactive Mini-Demo Hover */}
+                        <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex flex-col items-center justify-center p-4 text-center">
+                            <div className="flex gap-1 mb-2">
+                                {[3, 7, 2, 9, 4].map((h, i) => (
+                                    <div key={i} className="w-2 bg-retro-secondary" style={{ height: h * 4 }}></div>
+                                ))}
+                            </div>
+                            <p className="text-[10px] font-black leading-tight mb-2">STARE AT YOUR TRUTH.</p>
+                            <button onClick={() => navigate('/login')} className="bg-white text-black text-[10px] font-black px-2 py-1 border border-white hover:bg-transparent hover:text-white">
+                                [LOGIN TO SEE YOURS]
+                            </button>
+                        </div>
                     </RetroCard>
                 </motion.div>
             </motion.section>
