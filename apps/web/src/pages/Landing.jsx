@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { RetroCard, RetroButton } from '../components/RetroUI';
-import { Clock, Zap, Shield, BarChart2, MousePointer, Activity, Eye, Linkedin, Github } from 'lucide-react';
+import { Clock, Zap, Shield, BarChart2, MousePointer, Activity, Eye, Linkedin, Github, Twitter } from 'lucide-react';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 60 },
@@ -308,6 +308,14 @@ export default function Landing() {
                             className="bg-white p-2 border-2 border-black shadow-retro hover:translate-y-[2px] hover:shadow-none transition-all text-black"
                         >
                             <Github size={20} />
+                        </a>
+                        <a
+                            href="https://x.com/PRATYAKSHRAJ11?t=Vca06XTQ_UbmEGTX9unkFg&s=09"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-white p-2 border-2 border-black shadow-retro hover:translate-y-[2px] hover:shadow-none transition-all text-black"
+                        >
+                            <Twitter size={20} />
                         </a>
                     </div>
                     <div className="text-xs font-bold text-gray-400 mt-4">
