@@ -98,34 +98,32 @@ export default function Landing() {
                 </motion.h1>
 
                 {/* User Count Badge */}
-                {userCount > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.5, type: "spring" }}
-                        className="mb-8 flex flex-col items-center gap-3"
-                    >
-                        <div className="flex -space-x-3">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <img
-                                    key={i}
-                                    src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${i + 42}`}
-                                    alt="User"
-                                    className="w-10 h-10 rounded-none border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000]"
-                                />
-                            ))}
-                            <div className="w-10 h-10 rounded-none border-2 border-black bg-retro-secondary flex items-center justify-center text-white font-black text-xs shadow-[2px_2px_0px_0px_#000]">
-                                +{userCount}
-                            </div>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5, type: "spring" }}
+                    className="mb-8 flex flex-col items-center gap-3"
+                >
+                    <div className="flex -space-x-3">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <img
+                                key={i}
+                                src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${i + 42}`}
+                                alt="User"
+                                className="w-10 h-10 rounded-none border-2 border-black bg-white shadow-[2px_2px_0px_0px_#000]"
+                            />
+                        ))}
+                        <div className="w-10 h-10 rounded-none border-2 border-black bg-retro-secondary flex items-center justify-center text-white font-black text-xs shadow-[2px_2px_0px_0px_#000]">
+                            +{userCount}
                         </div>
-                        <div className="flex items-center gap-2 bg-retro-secondary text-white px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_#000] transform -rotate-1">
-                            <Zap size={18} className="animate-pulse" />
-                            <span className="font-black text-sm uppercase tracking-wider">
-                                {userCount + 100}+ BATTLE-TESTED PRODUCTIVITY WARRIORS
-                            </span>
-                        </div>
-                    </motion.div>
-                )}
+                    </div>
+                    <div className="flex items-center gap-2 bg-retro-secondary text-white px-4 py-2 border-2 border-black shadow-[4px_4px_0px_0px_#000] transform -rotate-1">
+                        <Zap size={18} className="animate-pulse" />
+                        <span className="font-black text-sm uppercase tracking-wider">
+                            {userCount + 100}+ BATTLE-TESTED PRODUCTIVITY WARRIORS
+                        </span>
+                    </div>
+                </motion.div>
 
                 <motion.p
                     variants={fadeInUp}
@@ -144,7 +142,7 @@ export default function Landing() {
                     className="flex flex-col items-center gap-4"
                 >
                     <RetroButton
-                        onClick={() => navigate('/login')}
+                        onClick={() => window.open('https://github.com/OneforAll-Deku/NONO/releases/tag/v1.0.0', '_blank')}
                         className="text-xl px-10 py-4 !bg-retro-secondary text-white shadow-[6px_6px_0px_0px_#000]"
                     >
                         [ GET NONO / FREE ]
@@ -193,7 +191,7 @@ export default function Landing() {
                         <div key={i} className="flex gap-12 items-center">
                             <span className="text-2xl font-black uppercase text-retro-accent">🔥 {userCount + 150} DISTRACTION KILLERS</span>
                             <span className="text-2xl font-black uppercase text-retro-secondary">⚡ {stats.gmailCount + 80} GOOGLE SIGN-INS</span>
-                            <span className="text-2xl font-black uppercase text-retro-primary">🔋 {stats.newToday + 5} JOINED TODAY</span>
+                            <span className="text-2xl font-black uppercase text-retro-primary">🚀 {stats.newToday + 5} JOINED TODAY</span>
                             <span className="text-2xl font-black uppercase text-green-500">👀 {stats.visitCount + 1000} TOTAL VISITS</span>
                             <span className="text-2xl font-black uppercase text-retro-accent">💎 {userCount + 150} DISTRACTION KILLERS</span>
                         </div>
