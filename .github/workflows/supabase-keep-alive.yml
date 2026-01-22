@@ -1,0 +1,39 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Runs every 12 hours
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase to prevent pausing
+        env:
+          SUPABASE_PROJECT_ID: "mtfgtrulaggnpkylaeik"
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::warning ::SUPABASE_ANON_KEY not set in GitHub Secrets. Skipping ping."
+            exit 0
+          fi
+
+          URL="https://${SUPABASE_PROJECT_ID}.supabase.co/rest/v1/"
+          echo "Sending keep-alive ping to $URL"
+          
+          # We use a simple GET request to the root or a health check if available
+          # Supabase REST API usually returns some JSON at the root
+          status_code=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${URL}")
+          
+          echo "Response Status Code: $status_code"
+          
+          if [[ "$status_code" =~ ^(200|401|404)$ ]]; then
+            echo "Success: Project is awake or reachable."
+          else
+            echo "::warning ::Unexpected status code $status_code. Check your Supabase configuration."
+          fi
