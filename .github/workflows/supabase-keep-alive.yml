@@ -2,43 +2,74 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */6 * * *' # Every 6 hours
   workflow_dispatch:
 
 jobs:
   keep-alive:
+    name: Ping Supabase Instance
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase to prevent pausing
+      - name: Network Check & Ping
         env:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          echo "--- 🛡️ Starting Supabase Keep-Alive Scan ---"
+          
+          MISSING_SECRET=false
           if [ -z "$SUPABASE_PROJECT_ID" ]; then
-            echo "SUPABASE_PROJECT_ID not set. Please add it to Repository Secrets."
-            exit 1
+            echo "❌ ERROR: SUPABASE_PROJECT_ID is missing from Repository Secrets."
+            MISSING_SECRET=true
           fi
           if [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "SUPABASE_ANON_KEY not set. Please add it to Repository Secrets."
+            echo "❌ ERROR: SUPABASE_ANON_KEY is missing from Repository Secrets."
+            MISSING_SECRET=true
+          fi
+          
+          if [ "$MISSING_SECRET" = true ]; then
+            echo ""
+            echo "💡 HOW TO FIX:"
+            echo "1. Go to your GitHub Repository Settings"
+            echo "2. Navigate to 'Secrets and variables' -> 'Actions'"
+            echo "3. Add 'SUPABASE_PROJECT_ID' (Your project ref: mtfgtrulaggnpkylaeik)"
+            echo "4. Add 'SUPABASE_ANON_KEY' (Your project anon/public key)"
             exit 1
           fi
 
           URL="https://${SUPABASE_PROJECT_ID}.supabase.co/rest/v1/"
+          echo "📡 Pinging: https://${SUPABASE_PROJECT_ID}.supabase.co"
           
-          echo "Sending keep-alive ping to $URL"
-          
-          response=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+          # Attempt to ping
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
-            -H "Content-Type: application/json" \
+            -m 10 \
             "${URL}")
-            
-          echo "Response Status Code: $response"
           
-          if [[ "$response" =~ ^(200|401|404)$ ]]; then
-            echo "Success: Project is active."
-          else
-            echo "Warning: Unexpected status code $response"
-            # We don't fail the build to keep "log_only" behavior, 
-            # unless it's a network error which curl would have shown.
-          fi
+          echo "📥 Response Code: $RESPONSE"
+          
+          case $RESPONSE in
+            200|201|204)
+              echo "✅ SUCCESS: Project is active and responding."
+              ;;
+            401|400)
+              echo "⚠️ WARNING: Got $RESPONSE. The project is alive but there might be an issue with the key permissions."
+              ;;
+            404)
+              echo "⚠️ WARNING: Got 404. The URL might be wrong or the project is in a strange state, but it responded."
+              ;;
+            503|504)
+              echo "🚨 ALERT: Project might be pausing or overloaded (Status $RESPONSE)."
+              exit 1
+              ;;
+            000)
+              echo "💀 CRITICAL: Connection failed. Supabase might be down or Project ID is invalid."
+              exit 1
+              ;;
+            *)
+              echo "❓ UNKNOWN: Received status $RESPONSE."
+              ;;
+          esac
+
+          echo "--- ✅ Keep-Alive Scan Complete ---"
