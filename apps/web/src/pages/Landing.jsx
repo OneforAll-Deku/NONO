@@ -191,7 +191,7 @@ export default function Landing() {
                         <div key={i} className="flex gap-12 items-center">
                             <span className="text-2xl font-black uppercase text-retro-accent">🔥 {userCount + 150} DISTRACTION KILLERS</span>
                             <span className="text-2xl font-black uppercase text-retro-secondary">⚡ {stats.gmailCount + 80} GOOGLE SIGN-INS</span>
-                            <span className="text-2xl font-black uppercase text-retro-primary">🚀 {stats.newToday + 5} JOINED TODAY</span>
+                            <span className="text-2xl font-black uppercase text-retro-primary">🚀 {userCount + 50} TOTAL JOINED</span>
                             <span className="text-2xl font-black uppercase text-green-500">👀 {stats.visitCount + 1000} TOTAL VISITS</span>
                             <span className="text-2xl font-black uppercase text-retro-accent">💎 {userCount + 150} DISTRACTION KILLERS</span>
                         </div>
