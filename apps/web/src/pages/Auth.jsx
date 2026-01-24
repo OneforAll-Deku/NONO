@@ -55,6 +55,13 @@ export default function Auth() {
                     SECURED BY SUPABASE
                 </div>
             </RetroCard>
+
+            <button
+                onClick={() => window.location.href = '/'}
+                className="mt-8 font-black text-gray-400 hover:text-black transition-colors"
+            >
+                ← BACK TO CIVILIZATION
+            </button>
         </div>
     );
 }

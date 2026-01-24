@@ -18,7 +18,7 @@ const staggerContainer = {
     }
 };
 
-export default function Landing() {
+export default function Landing({ session }) {
     const navigate = useNavigate();
     const [stats, setStats] = useState({ count: 0, gmailCount: 0, newToday: 0, visitCount: 0 });
     const [openFaq, setOpenFaq] = useState(null);
@@ -88,8 +88,14 @@ export default function Landing() {
                     </span>
                 </motion.div>
                 <div className="flex gap-4">
-                    <RetroButton variant="white" onClick={() => navigate('/login')}>Login</RetroButton>
-                    <RetroButton onClick={() => navigate('/login')}>Start Free</RetroButton>
+                    {session ? (
+                        <RetroButton onClick={() => navigate('/dashboard')}>Go to Dashboard</RetroButton>
+                    ) : (
+                        <>
+                            <RetroButton variant="white" onClick={() => navigate('/login')}>Login</RetroButton>
+                            <RetroButton onClick={() => navigate('/login')}>Start Free</RetroButton>
+                        </>
+                    )}
                 </div>
             </nav>
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Calendar, Filter, BarChart2, Zap, Layers, LogOut, CheckSquare, Download } from 'lucide-react';
+import { Calendar, Filter, BarChart2, Zap, Layers, LogOut, CheckSquare, Download, Home } from 'lucide-react';
 import { RetroCard, RetroButton } from '../components/RetroUI';
 import { supabase } from '../lib/supabase';
 
@@ -217,6 +217,9 @@ export default function Dashboard({ session }) {
                     <div className="bg-white border-2 border-black p-2 font-mono text-xs">
                         ID: {session?.user?.id.slice(0, 8)}...
                     </div>
+                    <RetroButton onClick={() => navigate('/')} variant="accent" className="!py-1 !px-3 text-sm flex items-center gap-2">
+                        <Home size={16} /> LANDING PAGE
+                    </RetroButton>
                     <RetroButton onClick={handleLogout} className="!py-1 !px-3 text-sm">
                         <LogOut size={16} />
                     </RetroButton>

@@ -33,7 +33,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={session ? <Navigate to="/dashboard" replace /> : <Landing />} />
+        <Route path="/" element={<Landing session={session} />} />
         <Route
           path="/login"
           element={!session ? <Auth /> : <Navigate to="/dashboard" replace />}
