@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Calendar, Filter, BarChart2, Zap, Layers, LogOut, CheckSquare, Download, Home } from 'lucide-react';
+import { Calendar as CalendarIcon, Filter, BarChart2, Zap, Layers, LogOut, CheckSquare, Download, Home, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RetroCard, RetroButton } from '../components/RetroUI';
+import { Calendar as RetroCalendar } from '../components/retroui/Calendar';
+import { format, parseISO } from 'date-fns';
 import { supabase } from '../lib/supabase';
 
 function notifyExtensionUserId(userId) {
@@ -26,6 +29,8 @@ export default function Dashboard({ session }) {
     const [hourlyStats, setHourlyStats] = useState([]);
 
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    const [showStartCalendar, setShowStartCalendar] = useState(false);
+    const [showEndCalendar, setShowEndCalendar] = useState(false);
 
     const [isExtensionConnected, setIsExtensionConnected] = useState(false);
 
@@ -267,29 +272,89 @@ export default function Dashboard({ session }) {
 
             <RetroCard>
                 <div className="flex flex-col sm:flex-row gap-4 items-end">
-                    <div className="flex-1 w-full">
+                    <div className="flex-1 w-full relative">
                         <label className="text-xs font-bold uppercase mb-1 block">Start Date</label>
-                        <div className="relative">
-                            <Calendar className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
-                            <input
-                                type="date"
-                                className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm focus:outline-none focus:shadow-retro-hover transition-all"
-                                value={dateRange.start}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                            />
-                        </div>
+                        <button
+                            onClick={() => {
+                                setShowStartCalendar(!showStartCalendar);
+                                setShowEndCalendar(false);
+                            }}
+                            className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between"
+                        >
+                            <CalendarIcon className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                            <span>{dateRange.start || 'Select Date'}</span>
+                            {dateRange.start && (
+                                <X
+                                    size={14}
+                                    className="cursor-pointer hover:text-red-500"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDateRange(prev => ({ ...prev, start: '' }));
+                                    }}
+                                />
+                            )}
+                        </button>
+                        <AnimatePresence>
+                            {showStartCalendar && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute bottom-full left-0 mb-2 z-50"
+                                >
+                                    <RetroCalendar
+                                        mode="single"
+                                        selected={dateRange.start ? parseISO(dateRange.start) : undefined}
+                                        onSelect={(date) => {
+                                            setDateRange(prev => ({ ...prev, start: date ? format(date, 'yyyy-MM-dd') : '' }));
+                                            setShowStartCalendar(false);
+                                        }}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
-                    <div className="flex-1 w-full">
+                    <div className="flex-1 w-full relative">
                         <label className="text-xs font-bold uppercase mb-1 block">End Date</label>
-                        <div className="relative">
-                            <Calendar className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
-                            <input
-                                type="date"
-                                className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm focus:outline-none focus:shadow-retro-hover transition-all"
-                                value={dateRange.end}
-                                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                            />
-                        </div>
+                        <button
+                            onClick={() => {
+                                setShowEndCalendar(!showEndCalendar);
+                                setShowStartCalendar(false);
+                            }}
+                            className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between"
+                        >
+                            <CalendarIcon className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                            <span>{dateRange.end || 'Select Date'}</span>
+                            {dateRange.end && (
+                                <X
+                                    size={14}
+                                    className="cursor-pointer hover:text-red-500"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDateRange(prev => ({ ...prev, end: '' }));
+                                    }}
+                                />
+                            )}
+                        </button>
+                        <AnimatePresence>
+                            {showEndCalendar && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute bottom-full left-0 mb-2 z-50"
+                                >
+                                    <RetroCalendar
+                                        mode="single"
+                                        selected={dateRange.end ? parseISO(dateRange.end) : undefined}
+                                        onSelect={(date) => {
+                                            setDateRange(prev => ({ ...prev, end: date ? format(date, 'yyyy-MM-dd') : '' }));
+                                            setShowEndCalendar(false);
+                                        }}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                     <RetroButton
                         onClick={() => setDateRange({ start: '', end: '' })}
