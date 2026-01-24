@@ -279,9 +279,9 @@ export default function Dashboard({ session }) {
                                 setShowStartCalendar(!showStartCalendar);
                                 setShowEndCalendar(false);
                             }}
-                            className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between"
+                            className="relative w-full bg-white border-2 border-black p-2 pl-10 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between h-10"
                         >
-                            <CalendarIcon className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                             <span>{dateRange.start || 'Select Date'}</span>
                             {dateRange.start && (
                                 <X
@@ -321,9 +321,9 @@ export default function Dashboard({ session }) {
                                 setShowEndCalendar(!showEndCalendar);
                                 setShowStartCalendar(false);
                             }}
-                            className="w-full bg-white border-2 border-black p-2 pl-8 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between"
+                            className="relative w-full bg-white border-2 border-black p-2 pl-10 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between h-10"
                         >
-                            <CalendarIcon className="absolute left-2 top-2.5 w-4 h-4 text-gray-500" />
+                            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                             <span>{dateRange.end || 'Select Date'}</span>
                             {dateRange.end && (
                                 <X
@@ -356,20 +356,28 @@ export default function Dashboard({ session }) {
                             )}
                         </AnimatePresence>
                     </div>
-                    <RetroButton
-                        onClick={() => setDateRange({ start: '', end: '' })}
-                        className="h-10 text-sm whitespace-nowrap"
-                        disabled={!dateRange.start && !dateRange.end}
-                    >
-                        <Filter size={14} className="mr-2" /> Clear
-                    </RetroButton>
-                    <RetroButton
-                        onClick={handleExport}
-                        className="h-10 text-sm whitespace-nowrap !bg-retro-secondary text-white"
-                        disabled={!logs || logs.length === 0}
-                    >
-                        <Download size={14} className="mr-2" /> Export
-                    </RetroButton>
+                    <div className="flex flex-row gap-2">
+                        <div className="flex flex-col">
+                            <div className="h-5"></div>
+                            <RetroButton
+                                onClick={() => setDateRange({ start: '', end: '' })}
+                                className="h-10 text-xs px-2 sm:px-4 whitespace-nowrap flex items-center gap-1"
+                                disabled={!dateRange.start && !dateRange.end}
+                            >
+                                <Filter size={14} /> CLEAR
+                            </RetroButton>
+                        </div>
+                        <div className="flex flex-col">
+                            <div className="h-5"></div>
+                            <RetroButton
+                                onClick={handleExport}
+                                className="h-10 text-xs px-2 sm:px-4 whitespace-nowrap !bg-retro-secondary text-white flex items-center gap-1"
+                                disabled={!logs || logs.length === 0}
+                            >
+                                <Download size={14} /> EXPORT
+                            </RetroButton>
+                        </div>
+                    </div>
                 </div>
             </RetroCard>
 
