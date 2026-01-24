@@ -279,10 +279,10 @@ export default function Dashboard({ session }) {
                                 setShowStartCalendar(!showStartCalendar);
                                 setShowEndCalendar(false);
                             }}
-                            className="relative w-full bg-white border-2 border-black p-2 pl-10 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between h-10"
+                            className="w-full bg-white border-2 border-black px-3 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center gap-3 h-10"
                         >
-                            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                            <span>{dateRange.start || 'Select Date'}</span>
+                            <CalendarIcon className="w-4 h-4 text-gray-500 shrink-0" />
+                            <span className="flex-1">{dateRange.start || 'Select Date'}</span>
                             {dateRange.start && (
                                 <X
                                     size={14}
@@ -321,10 +321,10 @@ export default function Dashboard({ session }) {
                                 setShowEndCalendar(!showEndCalendar);
                                 setShowStartCalendar(false);
                             }}
-                            className="relative w-full bg-white border-2 border-black p-2 pl-10 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center justify-between h-10"
+                            className="w-full bg-white border-2 border-black px-3 font-mono text-sm text-left focus:outline-none focus:shadow-retro-hover transition-all flex items-center gap-3 h-10"
                         >
-                            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                            <span>{dateRange.end || 'Select Date'}</span>
+                            <CalendarIcon className="w-4 h-4 text-gray-500 shrink-0" />
+                            <span className="flex-1">{dateRange.end || 'Select Date'}</span>
                             {dateRange.end && (
                                 <X
                                     size={14}
